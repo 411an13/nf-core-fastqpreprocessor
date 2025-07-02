@@ -1,0 +1,16 @@
+repository_type: pipeline
+
+nf_core_version: 3.3.1
+
+lint: {}
+
+template:
+  org: nf-core
+  name: fastqpreprocessor
+  description: Fastq preprocessor with optional contamination removal implemented
+    in NextFlow. Supports short and long reads.
+  author: Josh L. Espinoza
+  version: 1.0.0dev
+  force: true
+  outdir: .
+  is_nfcore: true
