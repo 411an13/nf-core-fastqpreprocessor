@@ -3,6 +3,7 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+include { fastq_fastp            } from '../subworkflows/local/fastq_fastp'
 include { FASTQC                 } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                } from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap       } from 'plugin/nf-schema'
@@ -24,6 +25,23 @@ workflow FASTQPREPROCESSOR {
 
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
+
+    //
+    // MODULE: Run Fastp
+    //
+    fastq_fastp(
+        reads                = ch_samplesheet,
+        adapter_fasta        = params.adapter_fasta,         // Replace with your adapter fasta channel if available
+        discard_trimmed_pass = params.discard_trimmed_pass,                   // Set as needed
+        save_trimmed_fail    = params.save_trimmed_fail,                   // Set as needed
+        save_merged          = params.save_merged                    // Set as needed
+    )
+
+    // Example: collect fastp outputs for MultiQC or downstream steps
+    ch_multiqc_files = ch_multiqc_files.mix(fastq_fastp.out.fastp_json.collect{it[1]})
+    ch_versions      = ch_versions.mix(fastq_fastp.out.versions.first())
+
+
     //
     // MODULE: Run FastQC
     //
